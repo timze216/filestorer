@@ -1,22 +1,6 @@
 
 
-# 文件保存在用户家目录下的 .filestore/
-# 获取目录 basepath
-home <- as.character(Sys.getenv()['HOME'])
-basepath <- file.path(home,'.filestore')
-recordsfile = file.path(basepath,'records.rds')
-if(!dir.exists(basepath)){
-  dir.create(basepath)
-}
 
-# 获取记录 records
-if(!file.exists(recordsfile)){
-  tmp <- as.data.frame(matrix(ncol = 5))
-  tmp = tmp[-1,]
-  colnames(tmp) <- c('md5','filename','save_time','rm_time','token')
-  saveRDS(tmp,recordsfile)
-}
-records = readRDS(recordsfile)
 
 #' @title store
 #' @param keepdays, how long will the file be kept, default is 7 days
@@ -46,7 +30,8 @@ store <- function(file, keepdays=7, token, update = T) {
             ', it will not be updated')
     return(2)
   }
-
+  basepath = prepare()[1]
+  recordsfile = prepare()[2]
   # 保存文件
   saveRDS(file,file.path(basepath,md5))
 
@@ -56,6 +41,7 @@ store <- function(file, keepdays=7, token, update = T) {
   f_name = as.character(substitute(file))
   new_rec = data.frame(md5,f_name,save_time,rm_time,token)
   colnames(new_rec) <- c('md5','filename','save_time','rm_time','token')
+  records = readRDS(recordsfile)
   records = rbind(records,new_rec)
   saveRDS(records,recordsfile)
 
@@ -72,8 +58,10 @@ store <- function(file, keepdays=7, token, update = T) {
 #' @param token, a token as same as the one in store()
 #' @return stored object
 getback <- function(filename,token) {
+  basepath = prepare()[1]
+  recordsfile = prepare()[2]
   rec = readRDS(recordsfile)
-  e = which(rec$token == token & rec$filename == file)
+  e = which(rec$token == token & rec$filename == filename)
   if(length(e) > 0){
     md5 = md5 = rec$md5[e]
     rds = readRDS(file.path(basepath,md5))
@@ -85,7 +73,10 @@ getback <- function(filename,token) {
 
 
 .check <- function(file,md5,token) {
+  basepath = prepare()[1]
+  recordsfile = prepare()[2]
   f_name = as.character(substitute(file))
+  records = readRDS(recordsfile)
   # 如果md5 一样,不用再保存
   if (md5 %in% records$md5) {
     e = which(records$md5 == md5)
@@ -114,6 +105,29 @@ getback <- function(filename,token) {
 }
 
 .clean <- function(i){
+  basepath = prepare()[1]
+  recordsfile = prepare()[2]
+  records = readRDS(recordsfile)
   md5 = records$md5[i]
   try(file.remove(file.path(basepath,md5)))
+}
+
+prepare <- function(){
+  # 获取目录 basepath
+  # 文件保存在用户家目录下的 .filestore/
+  home <- as.character(Sys.getenv()['HOME'])
+  basepath <- file.path(home,'.filestore')
+  recordsfile = file.path(basepath,'records.rds')
+  if(!dir.exists(basepath)){
+    dir.create(basepath)
+  }
+  
+  # 获取记录 records
+  if(!file.exists(recordsfile)){
+    tmp <- as.data.frame(matrix(ncol = 5))
+    tmp = tmp[-1,]
+    colnames(tmp) <- c('md5','filename','save_time','rm_time','token')
+    saveRDS(tmp,recordsfile)
+  }
+  return(c(basepath,recordsfile))
 }

@@ -1,7 +1,7 @@
 Package: filestorer
 Type: Package
 Title: A package for cache files storage
-Version: 0.1.0
+Version: 0.1.1
 Author: Tianzhi Wu
 Description: 
 	A simple Package to store cache file

@@ -1,5 +1,5 @@
 ---
-title: "Vignette filestorer"
+title: "Usage of filestorer"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -30,10 +30,7 @@ if (status == 0){
 ## get file back
 ```{r}
 library(filestorer)
-test = getback('text', token = 'jafkahfiucsjsjafofa')
-if (status == 0){
-  message('file have been saved')
-}
+test = getback(filename = 'test', token = 'jafkahfiucsjsjafofa')
 test
 ```
 
