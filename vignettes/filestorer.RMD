@@ -30,7 +30,7 @@ if (status == 0){
 ## get file back
 ```{r}
 library(filestorer)
-test = store(filename = 'text', token = 'jafkahfiucsjsjafofa')
+test = getback('text', token = 'jafkahfiucsjsjafofa')
 if (status == 0){
   message('file have been saved')
 }
