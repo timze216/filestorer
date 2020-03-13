@@ -27,7 +27,7 @@
 
    ```R
    library(filestorer)
-   test = getback('text', token = 'jafkahfiucsjsjafofa')
+   test = getback('test', token = 'jafkahfiucsjsjafofa')
    test
    ```
 
